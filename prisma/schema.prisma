@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum StatusMahasiswa {
+  AKTIF
+  CUTI
+  LULUS
+}
+
+model Student {
+  id        Int             @id @default(autoincrement())
+  nim       String          @unique
+  nama      String
+  email     String          @unique
+  jurusan   String
+  angkatan  Int
+  ipk       Float           @default(0.0)
+  status    StatusMahasiswa @default(AKTIF)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@map("students")
+}

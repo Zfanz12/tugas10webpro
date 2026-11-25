@@ -1,0 +1,55 @@
+### 1. Ambil Semua Data Mahasiswa
+GET http://localhost:3000/students
+
+### 2. Ambil Data Mahasiswa Berdasarkan ID
+GET http://localhost:3000/students/1
+
+### 3. Tambah Data Mahasiswa Baru (Create)
+POST http://localhost:3000/students
+Content-Type: application/json
+
+{
+  "nim": "103022400111",
+  "nama": "Farhan Maulana",
+  "email": "farhan@student.telkomuniversity.ac.id",
+  "jurusan": "S1 Informatika",
+  "angkatan": 2024,
+  "ipk": 3.78,
+  "status": "AKTIF"
+}
+
+### 4. Perbarui Sebagian Data Mahasiswa (Update - PATCH)
+PATCH http://localhost:3000/students/6
+Content-Type: application/json
+
+{
+  "jurusan": "S1 Rekayasa Perangkat Lunak",
+  "ipk": 3.92
+}
+
+### 5. Hapus Data Mahasiswa (Delete)
+DELETE http://localhost:3000/students/6
+
+### 6. Bonus: Filter Lanjutan dengan Prisma where
+GET http://localhost:3000/students/filter?jurusan=Rekayasa&minIpk=3.6&status=AKTIF
+
+### 7. Bonus: Pencarian Bebas (Search nama / nim / email)
+GET http://localhost:3000/students?search=Zulfan
+
+### 8. Bonus: Statistik Mahasiswa (count, aggregate, groupBy)
+GET http://localhost:3000/students/stats
+
+### 9. Uji Validasi Error (400 Bad Request - Input tidak valid)
+POST http://localhost:3000/students
+Content-Type: application/json
+
+{
+  "nim": "",
+  "nama": "Tanpa Email Valid",
+  "email": "bukan-email",
+  "jurusan": "S1 Informatika",
+  "angkatan": 1990
+}
+
+### 10. Uji Not Found Error (404 Not Found)
+GET http://localhost:3000/students/9999

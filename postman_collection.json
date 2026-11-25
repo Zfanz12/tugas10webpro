@@ -1,0 +1,138 @@
+{
+  "info": {
+    "_postman_id": "b10c7645-1234-4567-8901-tugas10studentapi",
+    "name": "Tugas 10 - Student API (PostgreSQL + Prisma)",
+    "description": "Koleksi Postman untuk Tugas 10 Pemrograman Web - CRUD REST API Student dengan NestJS, Prisma ORM, dan PostgreSQL.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. GET All Students",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/students",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["students"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2. GET Student By ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/students/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["students", "1"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3. POST Create Student",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nim\": \"103022400111\",\n  \"nama\": \"Farhan Maulana\",\n  \"email\": \"farhan@student.telkomuniversity.ac.id\",\n  \"jurusan\": \"S1 Informatika\",\n  \"angkatan\": 2024,\n  \"ipk\": 3.78,\n  \"status\": \"AKTIF\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/students",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["students"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4. PATCH Update Student",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jurusan\": \"S1 Rekayasa Perangkat Lunak\",\n  \"ipk\": 3.92\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/students/6",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["students", "6"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5. DELETE Student",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/students/6",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["students", "6"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6. GET Filter Students (Bonus Where Query)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/students/filter?jurusan=Rekayasa&minIpk=3.6&status=AKTIF",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["students", "filter"],
+          "query": [
+            { "key": "jurusan", "value": "Rekayasa" },
+            { "key": "minIpk", "value": "3.6" },
+            { "key": "status", "value": "AKTIF" }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "7. GET Student Statistics (Bonus Count & GroupBy)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/students/stats",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["students", "stats"]
+        }
+      },
+      "response": []
+    }
+  ]
+}
