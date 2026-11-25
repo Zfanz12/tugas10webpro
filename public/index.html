@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SiMaha — Manajemen Data Mahasiswa (NestJS + PostgreSQL + Prisma)</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-2: #f1f5f9;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --success-bg: #dcfce7;
+      --success-fg: #166534;
+      --warn-bg: #fef3c7;
+      --warn-fg: #92400e;
+      --info-bg: #dbeafe;
+      --info-fg: #1e40af;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --radius: 14px;
+      --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 6px 18px rgba(15, 23, 42, 0.04);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: #fff;
+      padding: 20px 16px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.14);
+    }
+    .header-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 42px; height: 42px; border-radius: 12px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
+      display: grid; place-items: center;
+      font-weight: 800; font-size: 18px; letter-spacing: -0.5px;
+    }
+    .brand h1 { font-size: 19px; font-weight: 700; letter-spacing: -0.2px; }
+    .brand p { font-size: 12.5px; color: #cbd5e1; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      color: #a7f3d0;
+      padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; }
+
+    main {
+      max-width: 1280px;
+      margin: 22px auto 40px;
+      padding: 0 16px;
+      display: grid;
+      gap: 20px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+    }
+    .stat-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+    .stat-value { font-size: 26px; font-weight: 800; margin-top: 4px; color: var(--text); }
+    .stat-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 15px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .card-header h2 { font-size: 15px; font-weight: 700; }
+    .card-body { padding: 18px; }
+
+    .form-grid { display: grid; gap: 11px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    label { display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 4px; }
+    input, select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      font-size: 13.5px;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+    }
+    input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14); }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 9px 14px; border-radius: 9px; border: none;
+      font-size: 13.5px; font-weight: 600; cursor: pointer; transition: 0.15s;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-ghost { background: var(--surface-2); color: #334155; }
+    .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 7px; }
+    .btn-danger { background: var(--danger-bg); color: var(--danger); }
+    .btn-row { display: flex; gap: 8px; margin-top: 4px; }
+
+    .filter-bar {
+      padding: 14px 18px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1.4fr 1.1fr 0.8fr 0.7fr auto;
+      gap: 9px;
+      align-items: center;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      text-align: left; padding: 10px 10px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.35px;
+      color: var(--muted); background: #f8fafc; border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    td { padding: 11px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    .student-name { font-weight: 700; color: var(--text); }
+    .student-email { font-size: 12px; color: var(--muted); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; }
+    .badge {
+      display: inline-block; padding: 3px 9px; border-radius: 999px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+    }
+    .badge-AKTIF { background: var(--success-bg); color: var(--success-fg); }
+    .badge-CUTI { background: var(--warn-bg); color: var(--warn-fg); }
+    .badge-LULUS { background: var(--info-bg); color: var(--info-fg); }
+    .actions { display: flex; gap: 6px; }
+    .alert {
+      display: none; padding: 10px 12px; border-radius: 9px; font-size: 12.5px; font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .alert.show { display: block; }
+    .alert-ok { background: var(--success-bg); color: var(--success-fg); }
+    .alert-err { background: var(--danger-bg); color: var(--danger); }
+
+    .mobile-list { display: none; padding: 12px; gap: 12px; }
+    .mobile-item {
+      border: 1px solid var(--border); border-radius: 12px; padding: 14px;
+      background: #fff; display: grid; gap: 8px;
+    }
+    .mobile-top { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
+    .mobile-meta {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+      font-size: 12.5px; color: #334155; background: var(--surface-2);
+      padding: 9px 10px; border-radius: 8px;
+    }
+    .mobile-meta span { color: var(--muted); font-size: 11px; display: block; }
+
+    footer {
+      text-align: center; color: var(--muted); font-size: 12px; padding: 14px 16px 28px;
+    }
+
+    @media (max-width: 960px) {
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .layout { grid-template-columns: minmax(0, 1fr); }
+      .filter-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px) {
+      header { padding: 14px 12px; }
+      .brand h1 { font-size: 16px; }
+      .brand p { font-size: 11.5px; }
+      main { margin-top: 12px; padding: 0 12px; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .stat-card { padding: 11px 12px; min-width: 0; }
+      .stat-value { font-size: 20px; }
+      .stat-sub { font-size: 11px; }
+      .card { min-width: 0; width: 100%; }
+      .layout > .card:last-child { order: -1; }
+      .filter-bar { grid-template-columns: minmax(0, 1fr); padding: 12px; }
+      .table-wrap { display: none; }
+      .mobile-list { display: grid; grid-template-columns: minmax(0, 1fr); }
+      .mobile-item { min-width: 0; }
+      .student-email { overflow-wrap: anywhere; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">SM</div>
+        <div>
+          <h1>SiMaha — Data Mahasiswa</h1>
+          <p>Tugas 10 Webpro · NestJS REST API + PostgreSQL + Prisma ORM</p>
+        </div>
+      </div>
+      <div class="pill"><span class="dot"></span> PostgreSQL Connected</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="stats-grid" id="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Mahasiswa</div>
+        <div class="stat-value" id="stat-total">-</div>
+        <div class="stat-sub">Tersimpan permanen di PostgreSQL</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Rata-rata IPK</div>
+        <div class="stat-value" id="stat-avg">-</div>
+        <div class="stat-sub" id="stat-minmax">Min - · Max -</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Status Aktif</div>
+        <div class="stat-value" id="stat-aktif">-</div>
+        <div class="stat-sub" id="stat-status-detail">Cuti: - · Lulus: -</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Program Studi</div>
+        <div class="stat-value" id="stat-prodi">-</div>
+        <div class="stat-sub">Grup via Prisma groupBy</div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="card">
+        <div class="card-header">
+          <h2 id="form-title">Tambah Mahasiswa</h2>
+          <span class="mono" style="color: var(--muted);" id="form-mode">POST /students</span>
+        </div>
+        <div class="card-body">
+          <div id="form-alert" class="alert"></div>
+          <form id="student-form" class="form-grid">
+            <input type="hidden" id="student-id" />
+            <div>
+              <label for="nim">NIM</label>
+              <input id="nim" required placeholder="Contoh: 103022400111" />
+            </div>
+            <div>
+              <label for="nama">Nama Lengkap</label>
+              <input id="nama" required placeholder="Nama mahasiswa" />
+            </div>
+            <div>
+              <label for="email">Email Institusi</label>
+              <input id="email" type="email" required placeholder="nama@student.telkomuniversity.ac.id" />
+            </div>
+            <div>
+              <label for="jurusan">Program Studi</label>
+              <input id="jurusan" required placeholder="S1 Rekayasa Perangkat Lunak" />
+            </div>
+            <div class="form-row-2">
+              <div>
+                <label for="angkatan">Angkatan</label>
+                <input id="angkatan" type="number" min="2000" max="2100" value="2024" required />
+              </div>
+              <div>
+                <label for="ipk">IPK</label>
+                <input id="ipk" type="number" step="0.01" min="0" max="4" value="3.75" />
+              </div>
+            </div>
+            <div>
+              <label for="status">Status Akademik</label>
+              <select id="status">
+                <option value="AKTIF">AKTIF</option>
+                <option value="CUTI">CUTI</option>
+                <option value="LULUS">LULUS</option>
+              </select>
+            </div>
+            <div class="btn-row">
+              <button type="submit" class="btn btn-primary" style="flex:1;" id="submit-btn">Simpan Data</button>
+              <button type="button" class="btn btn-ghost" id="reset-btn">Reset</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Daftar Mahasiswa</h2>
+          <span class="mono" style="color: var(--muted);" id="list-count">Memuat...</span>
+        </div>
+
+        <div class="filter-bar">
+          <input id="filter-search" placeholder="Cari nama, NIM, atau email..." />
+          <input id="filter-jurusan" placeholder="Filter jurusan (mis. Rekayasa)" />
+          <select id="filter-status">
+            <option value="">Semua Status</option>
+            <option value="AKTIF">AKTIF</option>
+            <option value="CUTI">CUTI</option>
+            <option value="LULUS">LULUS</option>
+          </select>
+          <input id="filter-min-ipk" type="number" step="0.1" min="0" max="4" placeholder="Min IPK" />
+          <button type="button" class="btn btn-primary btn-sm" id="apply-filter">Filter</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>NIM</th>
+                <th>Mahasiswa</th>
+                <th>Program Studi</th>
+                <th>Angkatan</th>
+                <th>IPK</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="student-tbody">
+              <tr><td colspan="7" style="text-align:center;color:var(--muted);">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mobile-list" id="student-mobile-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Zulfan Falah Permana (103022400076) · Tugas Perkuliahan Bab 10 — NestJS + PostgreSQL + Prisma ORM
+  </footer>
+
+  <script>
+    const API = '/students';
+    const els = {
+      tbody: document.getElementById('student-tbody'),
+      mobile: document.getElementById('student-mobile-list'),
+      count: document.getElementById('list-count'),
+      form: document.getElementById('student-form'),
+      alert: document.getElementById('form-alert'),
+      id: document.getElementById('student-id'),
+      nim: document.getElementById('nim'),
+      nama: document.getElementById('nama'),
+      email: document.getElementById('email'),
+      jurusan: document.getElementById('jurusan'),
+      angkatan: document.getElementById('angkatan'),
+      ipk: document.getElementById('ipk'),
+      status: document.getElementById('status'),
+      formTitle: document.getElementById('form-title'),
+      formMode: document.getElementById('form-mode'),
+      submitBtn: document.getElementById('submit-btn'),
+      resetBtn: document.getElementById('reset-btn'),
+      fSearch: document.getElementById('filter-search'),
+      fJurusan: document.getElementById('filter-jurusan'),
+      fStatus: document.getElementById('filter-status'),
+      fMinIpk: document.getElementById('filter-min-ipk'),
+      applyFilter: document.getElementById('apply-filter'),
+    };
+
+    function showAlert(msg, isError = false) {
+      els.alert.textContent = msg;
+      els.alert.className = `alert show ${isError ? 'alert-err' : 'alert-ok'}`;
+      setTimeout(() => els.alert.classList.remove('show'), 3500);
+    }
+
+    async function loadStats() {
+      const res = await fetch(`${API}/stats`);
+      const json = await res.json();
+      const d = json.data;
+      document.getElementById('stat-total').textContent = d.totalMahasiswa;
+      document.getElementById('stat-avg').textContent = d.ringkasanIpk.rataRata.toFixed(2);
+      document.getElementById('stat-minmax').textContent = `Min ${d.ringkasanIpk.terendah.toFixed(2)} · Max ${d.ringkasanIpk.tertinggi.toFixed(2)}`;
+      const statusMap = Object.fromEntries(d.perStatus.map((s) => [s.status, s.jumlah]));
+      document.getElementById('stat-aktif').textContent = statusMap.AKTIF || 0;
+      document.getElementById('stat-status-detail').textContent = `Cuti: ${statusMap.CUTI || 0} · Lulus: ${statusMap.LULUS || 0}`;
+      document.getElementById('stat-prodi').textContent = d.perJurusan.length;
+    }
+
+    async function loadStudents() {
+      const params = new URLSearchParams();
+      if (els.fSearch.value.trim()) params.set('search', els.fSearch.value.trim());
+      if (els.fJurusan.value.trim()) params.set('jurusan', els.fJurusan.value.trim());
+      if (els.fStatus.value) params.set('status', els.fStatus.value);
+      if (els.fMinIpk.value) params.set('minIpk', els.fMinIpk.value);
+
+      const url = params.toString() ? `${API}/filter?${params}` : API;
+      const res = await fetch(url);
+      const json = await res.json();
+      const rows = json.data || [];
+      els.count.textContent = `${rows.length} mahasiswa`;
+
+      if (!rows.length) {
+        els.tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Tidak ada data mahasiswa yang sesuai.</td></tr>';
+        els.mobile.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;">Tidak ada data mahasiswa yang sesuai.</div>';
+        return;
+      }
+
+      els.tbody.innerHTML = rows.map((s) => `
+        <tr>
+          <td class="mono">${s.nim}</td>
+          <td>
+            <div class="student-name">${s.nama}</div>
+            <div class="student-email">${s.email}</div>
+          </td>
+          <td>${s.jurusan}</td>
+          <td>${s.angkatan}</td>
+          <td class="mono" style="font-weight:700;">${Number(s.ipk).toFixed(2)}</td>
+          <td><span class="badge badge-${s.status}">${s.status}</span></td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-ghost btn-sm" onclick='editStudent(${JSON.stringify(s)})'>Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteStudent(${s.id}, '${s.nama}')">Hapus</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      els.mobile.innerHTML = rows.map((s) => `
+        <div class="mobile-item">
+          <div class="mobile-top">
+            <div>
+              <div class="student-name">${s.nama}</div>
+              <div class="mono" style="color:var(--muted);">${s.nim}</div>
+            </div>
+            <span class="badge badge-${s.status}">${s.status}</span>
+          </div>
+          <div class="student-email">${s.email}</div>
+          <div class="mobile-meta">
+            <div><span>Program Studi</span>${s.jurusan}</div>
+            <div><span>Angkatan / IPK</span>${s.angkatan} · IPK ${Number(s.ipk).toFixed(2)}</div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-ghost btn-sm" style="flex:1;" onclick='editStudent(${JSON.stringify(s)})'>Edit</button>
+            <button class="btn btn-danger btn-sm" style="flex:1;" onclick="deleteStudent(${s.id}, '${s.nama}')">Hapus</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.editStudent = (s) => {
+      els.id.value = s.id;
+      els.nim.value = s.nim;
+      els.nama.value = s.nama;
+      els.email.value = s.email;
+      els.jurusan.value = s.jurusan;
+      els.angkatan.value = s.angkatan;
+      els.ipk.value = s.ipk;
+      els.status.value = s.status;
+      els.formTitle.textContent = `Edit Mahasiswa #${s.id}`;
+      els.formMode.textContent = `PATCH /students/${s.id}`;
+      els.submitBtn.textContent = 'Update Data';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    function resetForm() {
+      els.form.reset();
+      els.id.value = '';
+      els.angkatan.value = 2024;
+      els.ipk.value = 3.75;
+      els.formTitle.textContent = 'Tambah Mahasiswa';
+      els.formMode.textContent = 'POST /students';
+      els.submitBtn.textContent = 'Simpan Data';
+    }
+
+    window.deleteStudent = async (id, nama) => {
+      if (!confirm(`Hapus data mahasiswa "${nama}"?`)) return;
+      const res = await fetch(`${API}/${id}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (!res.ok) return showAlert(json.message || 'Gagal menghapus data', true);
+      showAlert(json.message);
+      await Promise.all([loadStudents(), loadStats()]);
+    };
+
+    els.form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = els.id.value;
+      const payload = {
+        nim: els.nim.value.trim(),
+        nama: els.nama.value.trim(),
+        email: els.email.value.trim(),
+        jurusan: els.jurusan.value.trim(),
+        angkatan: Number(els.angkatan.value),
+        ipk: Number(els.ipk.value),
+        status: els.status.value,
+      };
+      const res = await fetch(id ? `${API}/${id}` : API, {
+        method: id ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        const msg = Array.isArray(json.message) ? json.message.join(', ') : json.message;
+        return showAlert(msg || 'Gagal menyimpan data', true);
+      }
+      showAlert(json.message);
+      resetForm();
+      await Promise.all([loadStudents(), loadStats()]);
+    });
+
+    els.resetBtn.addEventListener('click', resetForm);
+    els.applyFilter.addEventListener('click', loadStudents);
+
+    Promise.all([loadStudents(), loadStats()]);
+  </script>
+</body>
+</html>
